@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Socket Test</title>
+</head>
+<body>
+
+<h2>Browser Chat Test</h2>
+
+<input id="username" placeholder="username">
+<button onclick="join()">JOIN</button>
+
+<hr>
+
+<input id="to" placeholder="TO SOCKET ID">
+<input id="msg" placeholder="message">
+<button onclick="send()">SEND</button>
+
+<ul id="messages"></ul>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+const socket = io("http://192.168.1.7:3000");
+
+socket.on("connect", () => {
+  console.log("CONNECTED:", socket.id);
+});
+
+socket.on("user_list", (users) => {
+  console.log("USERS:", users);
+});
+
+socket.on("receive_private", (data) => {
+  const li = document.createElement("li");
+  li.innerText = data.from + ": " + data.message;
+  document.getElementById("messages").appendChild(li);
+});
+
+function join() {
+  const username = document.getElementById("username").value;
+  socket.emit("join", username);
+}
+
+function send() {
+  socket.emit("send_private", {
+    to: document.getElementById("to").value,
+    message: document.getElementById("msg").value,
+    from: "PC_USER"
+  });
+}
+</script>
+
+</body>
+</html>
